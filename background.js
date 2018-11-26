@@ -1,5 +1,11 @@
 'use strict';
 
+chrome.runtime.onInstalled.addListener(function() {
+  chrome.storage.sync.set({slackURL: 'https://slack.com'}, function() {
+    console.info('Changed Slack URL');
+  });
+});
+
 chrome.alarms.create("reminder", {
   delayInMinutes: 1,
   periodInMinutes: 1
@@ -9,37 +15,48 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
   if (alarm.name === "reminder") {
     var date    = new Date();
     var minute  = date.getMinutes();
-    var hour    = date.getHours(); 
-    if(hour === 13 && minute === 0) {
+    var hour    = date.getHours();
+    var day     = date.getDay();
+
+    // clear previous notifications
+    chrome.notifications.getAll((items) => {
+      if ( items ) {
+        for (let key in items) {
+          chrome.notifications.clear(key);
+        }
+      }
+    });
+
+    if(hour === 13 && minute === 45) {
       chrome.notifications.create({
         type: 'basic',
-        title: 'Sprint is over!',
-        message: 'Check if anyone needs your help',
-        iconUrl: 'img/slack.png'
+        title: 'Do domu?',
+        message: 'Upewnij się, że odpowiedziałeś na wszystkie pytania',
+        iconUrl: 'img/slack.png',
+        requireInteraction: true
       });
 
-      chrome.notifications.onClicked.addListener(function() {
-        chrome.tabs.create({ url: 'https://slack.com' });
-      });
-
-    } else if(minute === 45) {
+    } else if(hour >= 6 && hour <= 13 && minute === 45) {
       chrome.notifications.create({
         type: 'basic',
-        title: 'Sprint is over!',
-        message: 'Check if anyone needs your help',
-        iconUrl: 'img/slack.png'
+        title: 'Koniec sprintu!',
+        message: 'Sprawdź czy nikt nie potrzebuje Twojej pomocy na Slacku',
+        iconUrl: 'img/boar128.png'
       });
 
-      chrome.notifications.onClicked.addListener(function() {
-        chrome.tabs.create({ url: 'https://slack.com' });
-      });
-
-    } else if(minute = 0) {
+    } else if(hour >= 6 && hour <= 13 && minute === 0) {
       chrome.notifications.create({
         type: 'basic',
-        title: 'Sprint just started!',
-        message: 'Turn off the Slack and stay focused!',
-        iconUrl: 'img/slack.png'
+        title: 'Sprint się zaczął!',
+        message: 'Wyłączaj Slacka i do roboty!',
+        iconUrl: 'img/horse128.png'
+      });
+
+      chrome.storage.local.get('slackURL', function(data) {
+        var url = data.slackURL;
+        chrome.notifications.onClicked.addListener(function() {
+          chrome.tabs.create({ url: data.slackURL });
+        });
       });
     }
 

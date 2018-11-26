@@ -1,11 +1,19 @@
 {
-  "name": "r3minder",
+  "name": "BuDzik",
   "version": "1.0",
-  "description": "A simple extension for Google Chrome to remind me to respond to all messages before I'll go home.",
-  "permissions": ["notifications", "alarms"],
+  "description": "Proste narzędzie dla Google Chrome do przypominania o sprintach.",
+  "permissions": ["notifications", "alarms", "storage"],
+  "options_page": "options.html",
   "background": {
     "scripts": ["background.js"],
     "persistent": true
   },
-  "manifest_version": 2
+  "icons": {
+    "16": "img/main_icon16.png",
+    "32": "img/main_icon32.png",
+    "48": "img/main_icon48.png",
+    "128": "img/main_icon128.png"
+  },
+  "manifest_version": 2,
+  "content_security_policy": "script-src 'self' https://cdnjs.cloudflare.com; object-src 'self'"
 }
